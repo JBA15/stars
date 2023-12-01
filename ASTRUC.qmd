@@ -150,7 +150,30 @@ head(terrain)
 head(climate)
 ```
 
+## Question 8
 
+```{r}
+climate |>
+  group_by(planet_identifier) |>
+  summarise(num_climate = n_distinct(climate_type)) |>
+  ggplot(aes(x = planet_identifier, y = num_climate)) +
+  geom_point() +
+  xlab("Planet identifier") +
+  ylab("Number of types of climates") +
+  ggtitle("Distribution of different types of climates per planet")
+```
+
+
+```{r}
+terrain |>
+  group_by(planet_identifier) |>
+  summarise(num_terrain = n_distinct(type_of_terrain)) |>
+  ggplot(aes(x = planet_identifier, y = num_terrain)) +
+  geom_point() +
+  xlab("Planet identifier") +
+  ylab("Number of types of terrains") +
+  ggtitle("Distribution of different types of terrains per planet")
+```
 
 
 
