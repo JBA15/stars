@@ -12,7 +12,7 @@ We created a data folder to store the files.
 
 ## Question 2
 
-[Here](https://github.com/JBA15/stars) is the URL to the repository containing the project on Github.
+You can find [here](https://github.com/JBA15/stars) the URL to the repository containing the project on Github.
 
 ```{r}
 #| message: false
@@ -22,6 +22,9 @@ library(vroom)
 library(dplyr)
 library(tidyr)
 library(ggplot2)
+library(knitr)
+library(stringr)
+theme_set(theme_bw())
 ```
 
 ## Question 3
@@ -61,53 +64,21 @@ num_variables <- ncol(planets)
 ```
 
 ```{r}
-sum_na_planet_key <- planets[["planet_key"]] |>
-  is.na() |>
-  sum()
-
-sum_na_planet <- planets[["planet"]] |>
-  is.na() |>
-  sum()
-
-sum_na_code <- planets[["STAR_CODE"]] |>
-  is.na() |>
-  sum()
-
-sum_na_mass <- planets[["relative mass"]] |>
-  is.na() |>
-  sum()
-
-sum_na_density <- planets[["Relative Density"]] |>
-  is.na() |>
-  sum()
-
-sum_na_radius <- planets[["RADIUS (EARTH)"]] |>
-  is.na() |>
-  sum()
-
-sum_na_terrain <- planets[["Type of terrain"]] |>
-  is.na() |>
-  sum()
-
-sum_na_climate <- planets[["Climate Type"]] |>
-  is.na() |>
-  sum()
+num_missing_values <- sapply(planets, function(x) sum(is.na(x)))
+obs_with_missing <- sum(apply(planets, 1, function(x) any(is.na(x))))
 ```
-
-
-
 
 ```{r}
 planets_summary <- data.frame(
   Attribute = c("Number of planets", 
                 "Number of variables",
-                "Number of missing values in relative density",
+                paste("Missing Values in '", names(num_missing_values), "'", sep = ""),
                 "Number of missing values in relative mass"),
   Value = c(
     num_planets,
     num_variables,
-    sum_na_density,
-    sum_na_mass
+    num_missing_values,
+    obs_with_missing
   )
 )
 knitr::kable(planets_summary, caption = "Check for the validity of the loading process for planets")
@@ -122,58 +93,36 @@ planets_no_na <- planets |>
   drop_na(`RADIUS (EARTH)`)
 
 ggplot(planets_no_na, aes(x = `Relative Density`, y = `relative mass`)) +
-  geom_point()
+  geom_point() +
+  ggtitle("The mass of a planet as a function of its density") +
+  xlab("Relative density") +
+  ylab("Relative mass")
 ```
 
 ## Question 6
 
 ```{r}
-max_mass <- planets_no_na[order(planets_no_na$`relative mass`),] |>
-  slice_tail() |>
-  select(planet)
+extreme_planets <- function(df, variable) {
+  max_row <- df %>%
+    filter(.[[variable]] == max(.[[variable]], na.rm = TRUE)) %>%
+    select(planet, Value = !!variable) %>%
+    mutate(Variable = variable, Extremity = "Max")
 
-max_density <- planets_no_na[order(planets_no_na$`Relative Density`),] |>
-  slice_tail() |>
-  select(planet)
+  min_row <- df %>%
+    filter(.[[variable]] == min(.[[variable]], na.rm = TRUE)) %>%
+    select(planet, Value = !!variable) %>%
+    mutate(Variable = variable, Extremity = "Min")
 
-max_radius <- planets_no_na[order(planets_no_na$`RADIUS (EARTH)`),] |>
-  slice_tail() |>
-  select(planet)
+  rbind(max_row, min_row)
+}
 
-min_mass <- planets_no_na[order(planets_no_na$`relative mass`),] |>
-  slice_head() |>
-  select(planet)
+extremes_mass <- extreme_planets(planets, "relative mass")
+extremes_density <- extreme_planets(planets, "Relative Density")
+extremes_radius <- extreme_planets(planets, "RADIUS (EARTH)")
 
-min_density <- planets_no_na[order(planets_no_na$`Relative Density`),] |>
-  slice_head() |>
-  select(planet)
+extreme_planets <- rbind(extremes_mass, extremes_density, extremes_radius)
 
-min_radius <- planets_no_na[order(planets_no_na$`RADIUS (EARTH)`),] |>
-  slice_head() |>
-  select(planet)
-```
-
-
-```{r}
-planets_outliers <- data.frame(
-  Attribute = c("Max mass", 
-                "Max density",
-                "Max radius",
-                "Min mass",
-                "Min density",
-                "Min radius"),
-  Value = c(
-    max_mass,
-    max_density,
-    max_radius,
-    min_mass,
-    min_density,
-    min_radius
-  )
-)
-
-knitr::kable(planets_outliers, caption = "The outliers")
-
+kable(extreme_planets, format = "markdown", col.names = c("Planet Name", "Value", "Variable", "Extremity"))
 ```
 
 # Improved data representation
@@ -181,9 +130,26 @@ knitr::kable(planets_outliers, caption = "The outliers")
 ## Question 7
 
 ```{r}
-terrain <- reframe(planets,
-                   )
+terrain_list <- str_split(planets[["Type Of Terrain"]], ";")
+
+terrain <- tibble(
+  planet_identifier = rep(planets[["Planet_key"]], sapply(terrain_list, length)),
+  type_of_terrain = unlist(terrain_list)
+  ) |>
+  distinct()
+
+climate_list <- str_split(planets[["Climate Type"]], ";")
+
+climate <- tibble(
+  planet_identifier = rep(planets[["Planet_key"]], sapply(climate_list, length)),
+  climate_type = unlist(climate_list)
+  ) |>
+  distinct()
+
+head(terrain)
+head(climate)
 ```
+
 
 
 
