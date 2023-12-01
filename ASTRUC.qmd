@@ -1,0 +1,30 @@
+---
+title: "ASTRUC"
+author: "Jean-Baptiste Astruc"
+format: html
+---
+
+# Main data set import
+
+## Question 1
+
+We created a data folder to store the files.
+
+## Question 2
+
+[Here](https://github.com/JBA15/stars) is the URL to the repository containing the project on Github.
+
+```{r}
+#| message: false
+here::i_am("stars.Rproj")
+library(here)
+library(vroom)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+```
+
+
+
+
+
