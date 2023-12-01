@@ -24,6 +24,29 @@ library(tidyr)
 library(ggplot2)
 ```
 
+## Question 3
+
+Let's load the main data set.
+
+```{r}
+planets <- vroom(here("data", "all-planets.csv"))
+```
+```{r}
+planets_summary <- data.frame(
+  Attribute = c("Number of planets", "Number of variables"),
+  Value = c(
+    nrow(planets),
+    ncol(planets)
+  )
+)
+knitr::kable(planets_summary, caption = "Check for the validity of the loading process for planets")
+
+if (nrow(planets) == 902) {
+  print("The loading process went great!")
+} else {
+  print("The loading process did not go well!")
+}
+```
 
 
 
