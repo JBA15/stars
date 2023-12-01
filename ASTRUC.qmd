@@ -181,7 +181,8 @@ knitr::kable(planets_outliers, caption = "The outliers")
 ## Question 7
 
 ```{r}
-
+terrain <- reframe(planets,
+                   )
 ```
 
 
