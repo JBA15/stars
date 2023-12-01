@@ -58,9 +58,8 @@ Moreover, we loaded the data in order to have numerical variables recognised as 
 ```{r}
 num_planets <- nrow(planets)
 num_variables <- ncol(planets)
-
-
 ```
+
 
 
 ```{r}
@@ -81,13 +80,63 @@ knitr::kable(planets_summary, caption = "Check for the validity of the loading p
 ```{r}
 planets_no_na <- planets |>
   drop_na(`relative mass`) |>
-  drop_na(`Relative Density`)
+  drop_na(`Relative Density`) |>
+  drop_na(`RADIUS (EARTH)`)
 
 ggplot(planets_no_na, aes(x = `Relative Density`, y = `relative mass`)) +
   geom_point()
 ```
 
+## Question 6
 
+```{r}
+max_mass <- planets_no_na[order(planets_no_na$`relative mass`),] |>
+  slice_tail() |>
+  select(planet)
+
+max_density <- planets_no_na[order(planets_no_na$`Relative Density`),] |>
+  slice_tail() |>
+  select(planet)
+
+max_radius <- planets_no_na[order(planets_no_na$`RADIUS (EARTH)`),] |>
+  slice_tail() |>
+  select(planet)
+
+min_mass <- planets_no_na[order(planets_no_na$`relative mass`),] |>
+  slice_head() |>
+  select(planet)
+
+min_density <- planets_no_na[order(planets_no_na$`Relative Density`),] |>
+  slice_head() |>
+  select(planet)
+
+min_radius <- planets_no_na[order(planets_no_na$`RADIUS (EARTH)`),] |>
+  slice_head() |>
+  select(planet)
+```
+
+
+```{r}
+planets_outliers <- data.frame(
+  Attribute = c("Max mass", 
+                "Max density",
+                "Max radius",
+                "Min mass",
+                "Min density",
+                "Min radius"),
+  Value = c(
+    max_mass,
+    max_density,
+    max_radius,
+    min_mass,
+    min_density,
+    min_radius
+  )
+)
+
+knitr::kable(planets_outliers, caption = "The outliers")
+
+```
 
 
 
