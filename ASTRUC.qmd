@@ -29,24 +29,88 @@ library(ggplot2)
 Let's load the main data set.
 
 ```{r}
-planets <- vroom(here("data", "all-planets.csv"))
+planets <- vroom(here("data", "all-planets.csv"),
+                 na = "Unknown",
+                 locale = locale(decimal_mark = ","),
+                 col_types = cols(
+                   Planet_key = col_double(),
+                   planet = col_character(),
+                   STAR_CODE = col_double(),
+                   `relative mass` = col_double(),
+                   `Relative Density` = col_double(),
+                   `RADIUS (EARTH)` = col_double(),
+                   `Type Of Terrain` = col_character(),
+                   `Climate Type` = col_character()
+                 ))
 ```
-```{r}
-planets_summary <- data.frame(
-  Attribute = c("Number of planets", "Number of variables"),
-  Value = c(
-    nrow(planets),
-    ncol(planets)
-  )
-)
-knitr::kable(planets_summary, caption = "Check for the validity of the loading process for planets")
 
-if (nrow(planets) == 902) {
+```{r}
+if (nrow(planets) == 902 & ncol(planets) == 8) {
   print("The loading process went great!")
 } else {
   print("The loading process did not go well!")
 }
 ```
+Moreover, we loaded the data in order to have numerical variables recognised as numerical variables.
+
+## Question 4
+
+```{r}
+num_planets <- nrow(planets)
+num_variables <- ncol(planets)
+
+
+```
+
+
+```{r}
+planets_summary <- data.frame(
+  Attribute = c("Number of planets", 
+                "Number of variables"),
+  Value = c(
+    num_planets,
+    num_variables
+  )
+)
+knitr::kable(planets_summary, caption = "Check for the validity of the loading process for planets")
+
+```
+
+## Question 5
+
+```{r}
+planets_no_na <- planets |>
+  drop_na(`relative mass`) |>
+  drop_na(`Relative Density`)
+
+ggplot(planets_no_na, aes(x = `Relative Density`, y = `relative mass`)) +
+  geom_point()
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
