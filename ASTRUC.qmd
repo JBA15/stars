@@ -60,19 +60,57 @@ num_planets <- nrow(planets)
 num_variables <- ncol(planets)
 ```
 
+```{r}
+sum_na_planet_key <- planets[["planet_key"]] |>
+  is.na() |>
+  sum()
+
+sum_na_planet <- planets[["planet"]] |>
+  is.na() |>
+  sum()
+
+sum_na_code <- planets[["STAR_CODE"]] |>
+  is.na() |>
+  sum()
+
+sum_na_mass <- planets[["relative mass"]] |>
+  is.na() |>
+  sum()
+
+sum_na_density <- planets[["Relative Density"]] |>
+  is.na() |>
+  sum()
+
+sum_na_radius <- planets[["RADIUS (EARTH)"]] |>
+  is.na() |>
+  sum()
+
+sum_na_terrain <- planets[["Type of terrain"]] |>
+  is.na() |>
+  sum()
+
+sum_na_climate <- planets[["Climate Type"]] |>
+  is.na() |>
+  sum()
+```
+
+
 
 
 ```{r}
 planets_summary <- data.frame(
   Attribute = c("Number of planets", 
-                "Number of variables"),
+                "Number of variables",
+                "Number of missing values in relative density",
+                "Number of missing values in relative mass"),
   Value = c(
     num_planets,
-    num_variables
+    num_variables,
+    sum_na_density,
+    sum_na_mass
   )
 )
 knitr::kable(planets_summary, caption = "Check for the validity of the loading process for planets")
-
 ```
 
 ## Question 5
@@ -138,6 +176,13 @@ knitr::kable(planets_outliers, caption = "The outliers")
 
 ```
 
+# Improved data representation
+
+## Question 7
+
+```{r}
+
+```
 
 
 
