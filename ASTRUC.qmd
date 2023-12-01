@@ -130,21 +130,24 @@ kable(extreme_planets, format = "markdown", col.names = c("Planet Name", "Value"
 ## Question 7
 
 ```{r}
-terrain_list <- str_split(planets[["Type Of Terrain"]], ";")
+terrain <- planets |>
+  select(Planet_key, `Type Of Terrain`) |>
+  separate_rows(`Type Of Terrain`, sep = ";") |>
+  mutate(`Type Of Terrain` = trimws(`Type Of Terrain`))
 
-terrain <- tibble(
-  planet_identifier = rep(planets[["Planet_key"]], sapply(terrain_list, length)),
-  type_of_terrain = unlist(terrain_list)
-  ) |>
-  distinct()
+climate <- planets |>
+  select(Planet_key, `Climate Type`, `RADIUS (EARTH)`) |>
+  separate_rows(`Climate Type`, sep = "; ") |>
+  mutate(`Climate Type` = trimws(`Climate Type`))
 
-climate_list <- str_split(planets[["Climate Type"]], ";")
 
-climate <- tibble(
-  planet_identifier = rep(planets[["Planet_key"]], sapply(climate_list, length)),
-  climate_type = unlist(climate_list)
-  ) |>
-  distinct()
+# climate_list <- str_split(planets[["Climate Type"]], ";")
+
+# climate <- tibble(
+#   planet_identifier = rep(planets[["Planet_key"]], sapply(climate_list, length)),
+#   climate_type = unlist(climate_list)
+#   ) |>
+#   distinct()
 
 head(terrain)
 head(climate)
@@ -154,9 +157,9 @@ head(climate)
 
 ```{r}
 climate |>
-  group_by(planet_identifier) |>
-  summarise(num_climate = n_distinct(climate_type)) |>
-  ggplot(aes(x = planet_identifier, y = num_climate)) +
+  group_by(Planet_key) |>
+  summarise(num_climate = n_distinct(`Climate Type`)) |>
+  ggplot(aes(x = Planet_key, y = num_climate)) +
   geom_point() +
   xlab("Planet identifier") +
   ylab("Number of types of climates") +
@@ -166,15 +169,27 @@ climate |>
 
 ```{r}
 terrain |>
-  group_by(planet_identifier) |>
-  summarise(num_terrain = n_distinct(type_of_terrain)) |>
-  ggplot(aes(x = planet_identifier, y = num_terrain)) +
+  group_by(Planet_key) |>
+  summarise(num_terrain = n_distinct(`Type Of Terrain`)) |>
+  ggplot(aes(x = Planet_key, y = num_terrain)) +
   geom_point() +
   xlab("Planet identifier") +
   ylab("Number of types of terrains") +
   ggtitle("Distribution of different types of terrains per planet")
 ```
 
+## Question 9
+
+```{r}
+climate |>
+  filter(!is.na(`RADIUS (EARTH)`)) |>
+  ggplot(aes(x = `Climate Type`, y = `RADIUS (EARTH)`)) +
+  geom_boxplot() +
+  xlab("Types of climate") +
+  ylab("Radius of the planet (1 being Earth)") +
+  ggtitle("Distribution of the radius of the planets conditioned by the climates") +
+  theme(axis.text.x = element_text(angle = 45, hjust=1))
+```
 
 
 
